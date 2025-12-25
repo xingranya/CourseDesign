@@ -10,7 +10,7 @@ import java.util.List;
  * 支持联系人的增删改查、遍历、前缀模糊查询等功能
  */
 public class AVLTree {
-    private BSTNode root;  // 树的根节点
+    private BSTNode root; // 树的根节点
 
     /**
      * 构造函数
@@ -156,7 +156,7 @@ public class AVLTree {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("姓名不能为空");
         }
-        int[] result = {0};
+        int[] result = { 0 };
         root = deleteNode(root, name, phone, result);
         return result[0] > 0;
     }
@@ -209,7 +209,7 @@ public class AVLTree {
                 node.setKey(minNode.getKey());
                 node.getContacts().clear();
                 node.getContacts().addAll(minNode.getContacts());
-                node.setRight(deleteNode(node.getRight(), minNode.getKey(), null, new int[]{0}));
+                node.setRight(deleteNode(node.getRight(), minNode.getKey(), null, new int[] { 0 }));
             } else {
                 return node;
             }
@@ -372,6 +372,40 @@ public class AVLTree {
             for (Contact c : node.getAllContacts()) {
                 System.out.println(c);
             }
+        }
+    }
+
+    /**
+     * 获取前序遍历联系人列表
+     */
+    public List<Contact> getPreorderContacts() {
+        List<Contact> contacts = new ArrayList<>();
+        getPreorderContactsHelper(root, contacts);
+        return contacts;
+    }
+
+    private void getPreorderContactsHelper(BSTNode node, List<Contact> contacts) {
+        if (node != null) {
+            contacts.addAll(node.getAllContacts());
+            getPreorderContactsHelper(node.getLeft(), contacts);
+            getPreorderContactsHelper(node.getRight(), contacts);
+        }
+    }
+
+    /**
+     * 获取后序遍历联系人列表
+     */
+    public List<Contact> getPostorderContacts() {
+        List<Contact> contacts = new ArrayList<>();
+        getPostorderContactsHelper(root, contacts);
+        return contacts;
+    }
+
+    private void getPostorderContactsHelper(BSTNode node, List<Contact> contacts) {
+        if (node != null) {
+            getPostorderContactsHelper(node.getLeft(), contacts);
+            getPostorderContactsHelper(node.getRight(), contacts);
+            contacts.addAll(node.getAllContacts());
         }
     }
 
