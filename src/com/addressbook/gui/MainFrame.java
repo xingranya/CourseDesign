@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
     private void initUI() {
         setTitle("通讯录管理系统");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1200, 900);
         setLocationRelativeTo(null);
 
         // 设置外观
