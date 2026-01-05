@@ -103,7 +103,13 @@ public class AVLTree {
         } else if (cmp > 0) {
             node.setRight(insertNode(node.getRight(), contact));
         } else {
-            // 姓名相同，添加到同名链表中
+            // 姓名相同，检查是否已存在相同电话的联系人
+            for (Contact c : node.getContacts()) {
+                if (c.getPhone().equals(contact.getPhone())) {
+                    throw new IllegalArgumentException("联系人已存在：" + contact.getName() + " (" + contact.getPhone() + ")");
+                }
+            }
+            // 没有重复，添加到同名链表中
             node.addContact(contact);
             return node;
         }

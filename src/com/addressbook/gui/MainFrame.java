@@ -100,5 +100,11 @@ public class MainFrame extends JFrame {
         service.addContact("赵六", "13800138004", "zhaoliu@email.com", "深圳市南山区");
         service.addContact("张伟", "13800138005", "zhangwei@email.com", "杭州市西湖区");
         service.addContact("张丽", "13800138006", "zhangli@email.com", "成都市武侯区");
+        service.addContact("陈晨", "13800138007", "chenchen@email.com", "南京市鼓楼区");
+        service.addContact("刘洋", "13800138008", "liuyang@email.com", "武汉市江汉区");
+        service.addContact("周杰", "13800138009", "zhoujie@email.com", "重庆市渝北区");
+        service.addContact("吴彦", "13800138010", "wuyan@email.com", "西安市雁塔区");
+        service.addContact("郑强", "13800138011", "zhengqiang@email.com", "郑州市金水区");
+        service.addContact("孙悦", "13800138012", "sunyue@email.com", "天津市和平区");
     }
 }

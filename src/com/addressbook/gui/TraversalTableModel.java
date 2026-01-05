@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 联系人表格模型
- * 用于在JTable中展示联系人信息
+ * 遍历表格模型（带序号）
+ * 用于在遍历页面展示联系人信息
  */
-public class ContactTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"姓名", "电话", "邮箱", "地址"};
+public class TraversalTableModel extends AbstractTableModel {
+    private final String[] columnNames = {"序号", "姓名", "电话", "邮箱", "地址"};
     private List<Contact> contacts;
 
     /**
      * 构造函数
      */
-    public ContactTableModel() {
+    public TraversalTableModel() {
         this.contacts = new ArrayList<>();
     }
 
@@ -29,29 +29,11 @@ public class ContactTableModel extends AbstractTableModel {
     }
 
     /**
-     * 添加联系人
-     */
-    public void addContact(Contact contact) {
-        contacts.add(contact);
-        fireTableRowsInserted(contacts.size() - 1, contacts.size() - 1);
-    }
-
-    /**
      * 清空所有数据
      */
     public void clear() {
         contacts.clear();
         fireTableDataChanged();
-    }
-
-    /**
-     * 获取指定行的联系人
-     */
-    public Contact getContactAt(int row) {
-        if (row >= 0 && row < contacts.size()) {
-            return contacts.get(row);
-        }
-        return null;
     }
 
     @Override
@@ -73,13 +55,16 @@ public class ContactTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Contact contact = contacts.get(rowIndex);
         switch (columnIndex) {
-            case 0: 
-                return "<html><body style='padding:5px;'><b>" + contact.getName() + "</b></body></html>";
+            case 0:
+                // 序号列
+                return "<html><body style='padding:5px;'><span style='color:#95a5a6;font-size:16px;'><b>" + (rowIndex + 1) + "</b></span></body></html>";
             case 1: 
-                return "<html><body style='padding:5px;'><span style='color:#34495e;'>📞 " + contact.getPhone() + "</span></body></html>";
+                return "<html><body style='padding:5px;'><b>" + contact.getName() + "</b></body></html>";
             case 2: 
-                return "<html><body style='padding:5px;'><span style='color:#7f8c8d;'>✉ " + contact.getEmail() + "</span></body></html>";
+                return "<html><body style='padding:5px;'><span style='color:#34495e;'>📞 " + contact.getPhone() + "</span></body></html>";
             case 3: 
+                return "<html><body style='padding:5px;'><span style='color:#7f8c8d;'>✉ " + contact.getEmail() + "</span></body></html>";
+            case 4: 
                 return "<html><body style='padding:5px;line-height:1.5;'><span style='color:#95a5a6;'>🏠 " + contact.getAddress() + "</span></body></html>";
             default: 
                 return null;

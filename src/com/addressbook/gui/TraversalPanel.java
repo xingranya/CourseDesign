@@ -5,31 +5,46 @@ import com.addressbook.service.AddressBookService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
 
 /**
  * 遍历展示面板
- * 以卡片列表形式展示前序、中序、后序遍历结果
+ * 使用表格形式展示前序、中序、后序遍历结果
  */
 public class TraversalPanel extends ModernPanel {
     private AddressBookService service;
-    private JPanel cardsPanel;
+    private TraversalTableModel tableModel;
+    private JTable table;
     private JLabel statusLabel;
-    private JScrollPane scrollPane;
 
     public TraversalPanel(AddressBookService service) {
         super(new BorderLayout(0, 0));
         this.service = service;
+        this.tableModel = new TraversalTableModel();
         setBackground(Color.WHITE);
         setShowBorder(false);
 
         // 1. 顶部控制栏
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
-        topPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
+        add(createTopBar(), BorderLayout.NORTH);
 
-        // 按钮组
+        // 2. 中间表格区域
+        add(createTablePanel(), BorderLayout.CENTER);
+
+        // 3. 底部提示栏
+        add(createBottomBar(), BorderLayout.SOUTH);
+
+        // 默认显示中序
+        showTraversal("inorder", "中序遍历 (左 -> 根 -> 右，即升序)");
+    }
+
+    private JPanel createTopBar() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        // 左侧：按钮组
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         buttonPanel.setOpaque(false);
 
@@ -46,42 +61,95 @@ public class TraversalPanel extends ModernPanel {
         buttonPanel.add(inorderBtn);
         buttonPanel.add(postorderBtn);
 
-        // 状态标签
+        // 右侧：状态标签
         statusLabel = new JLabel("请选择遍历方式");
         statusLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
         statusLabel.setForeground(new Color(127, 140, 141));
 
-        topPanel.add(buttonPanel, BorderLayout.WEST);
-        topPanel.add(statusLabel, BorderLayout.EAST);
+        panel.add(buttonPanel, BorderLayout.WEST);
+        panel.add(statusLabel, BorderLayout.EAST);
 
-        add(topPanel, BorderLayout.NORTH);
-
-        // 2. 内容区域 (卡片列表)
-        cardsPanel = new JPanel();
-        cardsPanel.setLayout(new BoxLayout(cardsPanel, BoxLayout.Y_AXIS));
-        cardsPanel.setBackground(new Color(236, 240, 241));
-        cardsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        scrollPane = new JScrollPane(cardsPanel);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.getViewport().setBackground(new Color(236, 240, 241));
-
-        add(scrollPane, BorderLayout.CENTER);
-
-        // 默认显示中序
-        showTraversal("inorder", "中序遍历 (左 -> 根 -> 右，即升序)");
+        return panel;
     }
 
     private JButton createTabButton(String text, Color color) {
         JButton btn = new ModernButton(text, color);
-        btn.setPreferredSize(new Dimension(100, 36));
+        btn.setPreferredSize(new Dimension(110, 36));
         return btn;
+    }
+
+    private JPanel createTablePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(236, 240, 241));
+        panel.setBorder(new EmptyBorder(20, 20, 0, 20));
+
+        table = new JTable(tableModel);
+        table.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        table.setRowHeight(55); // 给多行内容留出空间
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionBackground(new Color(232, 246, 253));
+        table.setSelectionForeground(Color.BLACK);
+
+        // 设置列宽
+        table.getColumnModel().getColumn(0).setPreferredWidth(60);  // 序号列
+        table.getColumnModel().getColumn(0).setMaxWidth(80);
+        table.getColumnModel().getColumn(1).setPreferredWidth(120); // 姓名列
+        table.getColumnModel().getColumn(2).setPreferredWidth(180); // 电话列
+        table.getColumnModel().getColumn(3).setPreferredWidth(250); // 邮箱列
+        table.getColumnModel().getColumn(4).setPreferredWidth(200); // 地址列
+
+        // 表头样式
+        table.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
+        table.getTableHeader().setBackground(Color.WHITE);
+        table.getTableHeader().setForeground(new Color(127, 140, 141));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 50));
+        table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(236, 240, 241)));
+
+        // 单元格渲染器
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                if (!isSelected) {
+                    c.setBackground(Color.WHITE);
+                }
+
+                // 底部边框分割线
+                JComponent jc = (JComponent) c;
+                jc.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(240, 240, 240)),
+                        new EmptyBorder(0, 15, 0, 15)));
+
+                return c;
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createBottomBar() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        panel.setBackground(new Color(236, 240, 241));
+
+        JLabel tipLabel = new JLabel("💡 提示: 选择不同的遍历方式查看AVL树的遍历顺序");
+        tipLabel.setFont(new Font("微软雅黑", Font.PLAIN, 12));
+        tipLabel.setForeground(new Color(149, 165, 166));
+
+        panel.add(tipLabel);
+        return panel;
     }
 
     private void showTraversal(String type, String desc) {
         statusLabel.setText(desc);
-        cardsPanel.removeAll();
 
         List<Contact> contacts = null;
         switch (type) {
@@ -96,71 +164,10 @@ public class TraversalPanel extends ModernPanel {
                 break;
         }
 
-        if (contacts != null && !contacts.isEmpty()) {
-            int index = 1;
-            for (Contact c : contacts) {
-                cardsPanel.add(createContactCard(c, index++));
-                cardsPanel.add(Box.createVerticalStrut(10)); // 卡片间距
-            }
+        if (contacts != null) {
+            tableModel.setContacts(contacts);
         } else {
-            JLabel emptyLabel = new JLabel("暂无联系人数据", SwingConstants.CENTER);
-            emptyLabel.setFont(new Font("微软雅黑", Font.PLAIN, 16));
-            emptyLabel.setForeground(Color.GRAY);
-            emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            cardsPanel.add(Box.createVerticalGlue());
-            cardsPanel.add(emptyLabel);
-            cardsPanel.add(Box.createVerticalGlue());
+            tableModel.clear();
         }
-
-        cardsPanel.revalidate();
-        cardsPanel.repaint();
-
-        // 滚动到顶部
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
-    }
-
-    /**
-     * 创建单个联系人卡片
-     */
-    private JPanel createContactCard(Contact c, int index) {
-        ModernPanel card = new ModernPanel(new BorderLayout(15, 0));
-        card.setBackground(Color.WHITE);
-        card.setBorder(new EmptyBorder(15, 20, 15, 20));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
-        card.setPreferredSize(new Dimension(0, 90));
-
-        // 左侧：序号和头像
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.setOpaque(false);
-        leftPanel.setPreferredSize(new Dimension(60, 0));
-
-        JLabel indexLabel = new JLabel(String.valueOf(index), SwingConstants.CENTER);
-        indexLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        indexLabel.setForeground(new Color(189, 195, 199));
-        leftPanel.add(indexLabel, BorderLayout.CENTER);
-
-        card.add(leftPanel, BorderLayout.WEST);
-
-        // 中间：信息
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        centerPanel.setOpaque(false);
-
-        // 第一行：姓名
-        JLabel nameLabel = new JLabel(c.getName());
-        nameLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
-        nameLabel.setForeground(new Color(44, 62, 80));
-        centerPanel.add(nameLabel);
-
-        // 第二行：详细信息 (使用HTML实现简单的富文本)
-        String details = String.format(
-                "<html><font color='#7F8C8D'>📱 %s &nbsp;&nbsp;|&nbsp;&nbsp; 📧 %s &nbsp;&nbsp;|&nbsp;&nbsp; 🏠 %s</font></html>",
-                c.getPhone(), c.getEmail(), c.getAddress());
-        JLabel detailLabel = new JLabel(details);
-        detailLabel.setFont(new Font("微软雅黑", Font.PLAIN, 13));
-        centerPanel.add(detailLabel);
-
-        card.add(centerPanel, BorderLayout.CENTER);
-
-        return card;
     }
 }

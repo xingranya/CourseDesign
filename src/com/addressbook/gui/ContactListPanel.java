@@ -129,7 +129,7 @@ public class ContactListPanel extends ModernPanel {
 
         table = new JTable(tableModel);
         table.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        table.setRowHeight(45); // 增加行高
+        table.setRowHeight(55); // 增加行高，给多行内容留出空间
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
